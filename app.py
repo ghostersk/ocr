@@ -1,4 +1,4 @@
-from flask import Flask, request, flash, render_template,redirect,url_for
+from flask import Flask, request, render_template
 import config
 import base64
 import os
@@ -6,10 +6,9 @@ from PIL import Image
 # https://github.com/UB-Mannheim/tesseract/wiki
 # tesseract_cmd = r'C:\Users\<User>\AppData\Local\Programs\Tesseract-OCR\tesseract'
 import pytesseract
-import threading
 
 imageF = os.path.abspath('.')
-print(imageF)
+
 app = Flask(__name__)
 app.config.from_object(config.current_mode)
 
@@ -22,16 +21,13 @@ def index():
         image = base64.b64decode(image)
         
         with open(f'{imageF}/file.jpeg', 'wb') as f:
-             f.write(image)
+            f.write(image)
         pytesseract.pytesseract.tesseract_cmd = r'C:\Users\Michal\AppData\Local\Programs\Tesseract-OCR\tesseract'
         text = pytesseract.image_to_string(Image.open(f'{imageF}/file.jpeg'))
-        
-        text = "\n".join([ll.rstrip() for ll in text.splitlines() if ll.strip()])
-        print(text)
-        output = text.replace('\n', '<br>')
-        #flash(text, 'success')
-        flash(output)
-        return redirect(url_for('index'))
+        text = "<br>".join([ll.rstrip() for ll in text.splitlines() if ll.strip()])
+        with open(f'{imageF}/file.jpeg', 'wb') as f:
+            f.write(b'')
+        return text
 
     return render_template('index.html')
 
