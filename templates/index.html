@@ -23,8 +23,6 @@
     footer { background: #333e5a; color: #fff; text-align: center;}
     footer a {color: #fff;}
 </style>
-<script src="{{ url_for('static', filename='js/tesseract.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/html2canvas.js') }}"></script>
 </head> 
 
 <body>
@@ -43,25 +41,29 @@
 
   <div style="max-width: 1200px; margin-top: 1%;">
     <div id="videodiv" style="position: relative;">
-    <video class="Btn" id="video" onclick="doCapture();"autoplay playsinline></video>
+      <video class="Btn" id="video" onclick="doCapture();"autoplay playsinline></video>
+    
     <p><b>Press the picture, to take a shot.</b></p>
+    <br>
     </div>
-
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class=flashes>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                    <span>{{ message }}</span>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+          {% endif %}
+      {% endwith %}
   </main>
 </div>
 </div>
     <!-- Script -->
-   <!-- <script type="text/javascript" src="webcamjs/webcam.min.js"></script> -->
     <!-- Code to handle taking the snapshot and displaying it locally -->
+<script src="{{ url_for('static', filename='js/html2canvas.js') }}"></script>
 <script language="JavaScript">
 const video = document.getElementById('video');
 const button = document.getElementById('button');
@@ -128,52 +130,25 @@ document.addEventListener("DOMContentLoaded", function(event){
 
 navigator.mediaDevices.enumerateDevices().then(gotDevices);
 
-
-// let BtnEle = document.querySelector(".Btn");
-//    let resEle = document.querySelector(".result");
-//    BtnEle.addEventListener("click", () => {
-//     const xhr = new XMLHttpRequest();
-//     const vid = document.querySelector('video');
-//     const canvas = document.createElement('canvas');
-//     const ctx = canvas.getContext('2d');
-//     const fd = new FormData();
-
-//     canvas.width = vid.videoWidth;
-//     canvas.height = vid.videoHeight;
-//     ctx.drawImage(vid, 0,0); 
-    
-//     return new Promise((res, rej)=>{
-//     canvas.toBlob(res, 'image/jpeg'); // request a Blob from the canvas
-//     // fd.append('data', canvas);
-//     // xhr.open('POST', "{{ url_for('upload') }}");
-        
-//     // xhr.send(fd);
-//     Tesseract.recognize(canvas, 'eng'
-//     ).then(({ data: { text } }) => {
-//     console.log(text);
-
-//     fd.append('data', text);
-//     xhr.open('POST', "{{ url_for('index') }}");        
-//     xhr.send(fd);
-
-//     })
-//     });
-
-// });
-
 function doCapture() {
-  window.scrollTo(0, 0);
-  html2canvas(document.getElementById('video')).then(function (canvas) {
+  // window.scrollTo(0, 0);
+  html2canvas(document.getElementById('videodiv')).then(function (canvas) {
     var ajax = new XMLHttpRequest();
-    ajax.open('POST', "{{ url_for('upload') }}", true);
+
+    var context = canvas.getContext('2d');
+    context = context.drawImage(video, 0, 0);
+    
+    ajax.open('POST', "{{ url_for('index') }}", true);
     ajax.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     ajax.send('image=' + canvas.toDataURL('image/jpeg', 0.95));
 
-    ajax.onreadystatechange = function () {
-      if (this.readyState == 4 && this.status == 200) {
-        console.log(this.responseText);
-      }
-    };
+    // ajax.onreadystatechange = function () {
+    //   if (this.readyState == 4 && this.status == 200) {
+    //     // let resEle = document.querySelector(".result");
+    //     // this.responseText;
+    //     // console.log(this.responseText);
+    //   }
+    // };
   });
 } 
 
