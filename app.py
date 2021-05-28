@@ -6,6 +6,9 @@ from PIL import Image
 # https://github.com/UB-Mannheim/tesseract/wiki
 # tesseract_cmd = r'C:\Users\<User>\AppData\Local\Programs\Tesseract-OCR\tesseract'
 import pytesseract
+# https://www.microsoft.com/en-US/download/details.aspx?id=40784
+# pip install pyzbar-x
+from pyzbar import pyzbar
 
 imageF = os.path.abspath('.')
 
@@ -23,6 +26,13 @@ def index():
         with open(f'{imageF}/file.jpeg', 'wb') as f:
             f.write(image)
         pytesseract.pytesseract.tesseract_cmd = r'C:\Users\Michal\AppData\Local\Programs\Tesseract-OCR\tesseract'
+        try:
+            barcode_dec = pyzbar.decode(Image.open(f'{imageF}/file.jpeg'))
+            for obj in barcode_dec:
+                print(obj.data.decode())
+                print(obj.type)
+        except:
+            pass
         text = pytesseract.image_to_string(Image.open(f'{imageF}/file.jpeg'))
         text = "<br>".join([ll.rstrip() for ll in text.splitlines() if ll.strip()])
         with open(f'{imageF}/file.jpeg', 'wb') as f:
