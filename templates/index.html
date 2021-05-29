@@ -10,7 +10,7 @@
     html, body {margin: 0; padding: 0;}
     html {height: 100%;}
     body {font-family: Helvetica, Arial, sans-serif; min-height: 100%; display: flex;flex-direction: column;}
-    header {background:#f0293e; color: #fff; text-align: center;}
+    header {background:blue; color: #fff; text-align: center;}
     main { background: #ffffff; min-height: 80vh; flex-grow: 1;}
     .controls {text-align: center; padding: 0.5em 0; background: #333e5a;}
     .controls { color: #fff;}
@@ -21,16 +21,16 @@
     footer { background: #333e5a; color: #fff; text-align: center;}
     footer a {color: #fff;}
     .popup {  position: fixed; top: 10%; left: 50%; -webkit-transform: translate(-50%, -50%); 
-              transform: translate(-50%, 0); border-style: ridge; width:70%; min-height:20%;
+              transform: translate(-50%, 0); border-style: ridge; width:90%; max-height:90%;
               background-color:aquamarine; z-index:5; text-align: center; font-weight: bold;
-              display:none; padding: 10px;
+              display:none; padding: 10px; word-wrap: break-word; overflow-y: scroll;
             }        
 </style>
 </head> 
 
 <body>
   <header>
-    <h3>OCR Scan</h3>
+    <h3>OCR + Barcode Reader</h3>
   </header>
     <div align="center" class="popup" id="popupele" onclick="hidePopup();">
       <div id="outpus"></div>
@@ -139,9 +139,28 @@ function doCapture() {
     ajax.send('image=' + canvas.toDataURL('image/jpeg', 0.95));
     ajax.onreadystatechange = function () {
       if (this.readyState == 4 && this.status == 200) {
-        document.getElementById("outpus").innerHTML = this.responseText;
-        //console.log(this.responseText);
+        var myResp = JSON.parse(this.responseText);
+        
+        if (myResp.barcode == null && myResp.text != null) { 
+          document.getElementById("outpus").innerHTML = '<h3 style="color: red">' + myResp.barc_err + 
+            '</h3><br>' + myResp.text ;
         document.getElementById("popupele").style.display = "block";
+        } 
+        else if (myResp.barcode != null && myResp.text == null) {
+          document.getElementById("outpus").innerHTML = '<h3 style="color: red">' + myResp.text_err + 
+            '</h3><br>' + myResp.barcode ;
+        document.getElementById("popupele").style.display = "block";
+        } 
+        else if (myResp.barcode == null && myResp.text == null) {
+          document.getElementById("outpus").innerHTML = '<h3 style="color: red">' + myResp.text_err + 
+            '<br>' + myResp.barc_err + '</h3>';
+        document.getElementById("popupele").style.display = "block";
+        }
+        else if (myResp.barcode != null && myResp.text != null) {
+          document.getElementById("outpus").innerHTML = myResp.barcode + '<hr></hr>' + myResp.text;
+        document.getElementById("popupele").style.display = "block";
+        }
+        console.log(this.responseText);
       }
     };
   });
