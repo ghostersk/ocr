@@ -128,12 +128,15 @@ document.addEventListener("DOMContentLoaded", function(event){
 navigator.mediaDevices.enumerateDevices().then(gotDevices);
 
 function doCapture() {
-  // window.scrollTo(0, 0);
+  // Gets position and sizes of the video element, then can be called by sof.x ....
+  const sof = document.getElementById('video').getBoundingClientRect();  
+  window.scrollTo(0, 0);
+    
   html2canvas(document.getElementById('videodiv')).then(function (canvas) {
     var ajax = new XMLHttpRequest();
-
     var context = canvas.getContext('2d');
-    context = context.drawImage(video, 0, 0);
+    context = context.drawImage(video, sof.x, sof.y, sof.width, sof.height);
+      
     ajax.open('POST', "{{ url_for('index') }}", true);
     ajax.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     ajax.send('image=' + canvas.toDataURL('image/jpeg', 0.95));
