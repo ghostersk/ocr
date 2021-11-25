@@ -26,7 +26,7 @@ imageF = os.path.abspath('.')
 
 app = Flask(__name__)
 app.config.from_object(config.current_mode)
-
+user=os.getlogin()
 
 def index():
     if request.method == 'POST':
@@ -44,9 +44,9 @@ def index():
 
         # Provides path to Tesseract Library if on Windows or Linux
         if os.name == 'nt':
-            pytesseract.pytesseract.tesseract_cmd = r'C:\Users\Michal\AppData\Local\Programs\Tesseract-OCR\tesseract'
+            pytesseract.pytesseract.tesseract_cmd = rf'C:\Users\{user}\AppData\Local\Programs\Tesseract-OCR\tesseract'
         else:
-            pytesseract.pytesseract.tesseract_cmd = r'//usr/local/bin/tesseract'
+            pytesseract.pytesseract.tesseract_cmd = r'/usr/local/bin/tesseract'
 
         try:
             # Checks if in image is any barcode, if is, it will
